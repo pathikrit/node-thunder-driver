@@ -1,0 +1,19 @@
+{
+  "name": "node-thunder-driver",
+  "version": "0.0.1",
+  "author": "Pathikrit Bhowmick <pathikrit.bhowmick@gmail.com>",
+  "description": "nodejs driver for dream cheeky usb thunder missile launcher",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pathikrit/node-thunder-driver.git"
+  },
+  "keywords": ["dream cheeky", "usb", "missile", "launcher", "driver"],
+  "dependencies": {
+    "node-usb": "git://github.com/nonolith/node-usb.git#2ed4a82310634c68b8914f0eff406d889394a7e3"
+  },
+  "license": "MIT",
+  "engine": {
+    "node": ">=0.6"
+  },
+  "os": [ "!win32" ]
+}
