@@ -1,6 +1,4 @@
-NodeJS Driver for [Dream Cheeky USB Thunder Missile Launcher][1]
-
-Prerequisites: [gcc-4.3][2], [pkg-config][3], [libusb-dev][4]
+Prerequisites: [usb missile launcher][1], [gcc-4.3][2], [pkg-config][3], [libusb-dev][4]
 
 See [usage][5]
 
