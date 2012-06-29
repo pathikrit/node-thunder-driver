@@ -6,12 +6,11 @@ function acquireLauncher() {
   }
   try {
     var usb = require('node-usb/usb.js');
-    launcher = usb.find_by_vid_and_pid(0x2123, 0x1010);
+    launcher = usb.find_by_vid_and_pid(0x2123, 0x1010)[0];
     if (!launcher) {
       console.error('Launcher not found :(');
       return;
     }
-    launcher = launcher[0];
     var launcherInterface = launcher.interfaces[0];
     if (launcherInterface.isKernelDriverActive()) {
       launcherInterface.detachKernelDriver();
