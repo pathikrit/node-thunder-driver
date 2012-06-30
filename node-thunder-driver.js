@@ -60,7 +60,6 @@ function insertStop(callback) {
 }
 
 var controller = {
-
   up: function (duration, callback) {
     execute(0x01, duration, insertStop(callback));
   },
