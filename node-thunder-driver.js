@@ -34,10 +34,7 @@ function execute(cmd, duration, callback) {
     try {
       launcher.controlTransfer(0x21, 0x09, 0x0, 0x0, new Buffer([0x02, cmd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
         function (data) {
-          if (!duration) {
-            duration = 0;
-          }
-          if (callback) {
+          if (callback && duration >= 0) {
             setTimeout(callback, duration);
           }
           console.log("Executed " + cmd + ' for ' + duration);
@@ -59,21 +56,25 @@ function insertStop(callback) {
   }
 }
 
+function normalize(duration) {
+  return duration ? duration : 0;
+}
+
 var controller = {
   up: function (duration, callback) {
-    execute(0x01, duration, insertStop(callback));
+    execute(0x01, normalize(duration), insertStop(callback));
   },
 
   down: function (duration, callback) {
-    execute(0x02, duration, insertStop(callback));
+    execute(0x02, normalize(duration), insertStop(callback));
   },
 
   left: function (duration, callback) {
-    execute(0x04, duration, insertStop(callback));
+    execute(0x04, normalize(duration), insertStop(callback));
   },
 
   right: function (duration, callback) {
-    execute(0x08, duration, insertStop(callback));
+    execute(0x08, normalize(duration), insertStop(callback));
   },
 
   stop: function (callback) {
