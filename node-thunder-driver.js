@@ -1,80 +1,65 @@
-var launcher;
+var _ = require('underscore'), launcher;
 
-function acquireLauncher() {
-  if (launcher) {
+try {
+  var usb = require('node-usb/usb.js');
+  launcher = usb.find_by_vid_and_pid(0x2123, 0x1010)[0];
+  if (!launcher) {
+    console.error('Launcher not found :(');
+  }
+  var launcherInterface = launcher.interfaces[0];
+  if (launcherInterface.isKernelDriverActive()) {
+    launcherInterface.detachKernelDriver();
+  }
+  launcherInterface.claim();
+  console.log('Attached rocket-adapter ...');
+  process.on('exit', function () {
+    console.log('Detaching rocket-adapter ...');
+    launcherInterface.release(function (data) {
+      console.log('Rocket-adapter detached: ' + data);
+    });
+  });
+} catch (err) {
+  console.error(err.stack);
+}
+
+function execute(cmd, duration, callback) {
+  if (!launcher) {
     return;
   }
+
   try {
-    var usb = require('node-usb/usb.js');
-    launcher = usb.find_by_vid_and_pid(0x2123, 0x1010)[0];
-    if (!launcher) {
-      console.error('Launcher not found :(');
-      return;
-    }
-    var launcherInterface = launcher.interfaces[0];
-    if (launcherInterface.isKernelDriverActive()) {
-      launcherInterface.detachKernelDriver();
-    }
-    launcherInterface.claim();
-    console.log('Attached rocket-adapter ...');
-    process.on('exit', function () {
-      console.log('Detaching rocket-adapter ...');
-      launcherInterface.release(function (data) {
-        console.log('Rocket-adapter detached: ' + data);
-      });
-    });
+    launcher.controlTransfer(0x21, 0x09, 0x0, 0x0, new Buffer([0x02, cmd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
+      function (data) {
+        duration = _.isNumber(duration) ? duration : 0;
+        if (duration >= 0) {
+          if (!_.isFunction(callback) && cmd != 0x20) {
+            callback = controller.stop;
+          }
+          setTimeout(callback, duration);
+        }
+        console.log("Executed " + cmd + ' for ' + duration);
+      }
+    );
   } catch (err) {
     console.error(err.stack);
   }
 }
 
-function execute(cmd, duration, callback) {
-  acquireLauncher();
-  if (launcher) {
-    try {
-      launcher.controlTransfer(0x21, 0x09, 0x0, 0x0, new Buffer([0x02, cmd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
-        function (data) {
-          if (callback && duration >= 0) {
-            setTimeout(callback, duration);
-          }
-          console.log("Executed " + cmd + ' for ' + duration);
-        }
-      );
-    } catch (err) {
-      console.error(err.stack);
-    }
-  }
-  return controller;
-}
-
-function insertStop(callback) {
-  return function () {
-    controller.stop();
-    if (callback && callback != controller.stop) {
-      callback.call();
-    }
-  }
-}
-
-function normalize(duration) {
-  return duration ? duration : 0;
-}
-
 var controller = {
   up: function (duration, callback) {
-    execute(0x01, normalize(duration), insertStop(callback));
+    execute(0x01, duration, callback);
   },
 
   down: function (duration, callback) {
-    execute(0x02, normalize(duration), insertStop(callback));
+    execute(0x02, duration, callback);
   },
 
   left: function (duration, callback) {
-    execute(0x04, normalize(duration), insertStop(callback));
+    execute(0x04, duration, callback);
   },
 
   right: function (duration, callback) {
-    execute(0x08, normalize(duration), insertStop(callback));
+    execute(0x08, duration, callback);
   },
 
   stop: function (callback) {
@@ -87,7 +72,10 @@ var controller = {
 
   fire: function (number, callback) {
     if (number == 0) {
-      insertStop(callback).call();
+      if (!_.isFunction(callback)) {
+        callback = controller.stop;
+      }
+      callback.call(this);
       return;
     }
     if (!number || number < 1 || number > 4) {
@@ -99,13 +87,19 @@ var controller = {
   },
 
   execute: function (commands, callback) {
-    if (typeof commands == 'string' || commands instanceof String) {
+    if (_.isString(commands)) {
       controller.execute(commands.split(','), callback);
       return;
     }
 
+    if (!_.isArray(commands)) {
+      throw "commands must be either a comma separated string or a string array";
+    }
+
     if (commands.length == 0) {
-      insertStop(callback).call();
+      if (_.isFunction(callback)) {
+        callback.call(this);
+      }
       return;
     }
 
