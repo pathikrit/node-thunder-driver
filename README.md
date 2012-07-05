@@ -1,4 +1,8 @@
-Prerequisites: [usb missile launcher][1], [gcc-4.3][2], [pkg-config][3], [libusb-dev][4]
+Prerequisites: 
+[usb missile launcher](http://www.dreamcheeky.com/thunder-missile-launcher), 
+[gcc-4.3](http://stackoverflow.com/questions/10480654/std-gnu0xoption-for-macos), 
+[pkg-config](http://manpages.ubuntu.com/manpages/hardy/man1/pkg-config.1.html), 
+[libusb-dev](http://ubuntuforums.org/showthread.php?t=1537201)
 
 Quick Start:
 
@@ -16,9 +20,9 @@ Quick Start:
     launcher.execute(command, [callback])
     launcher.reset([callback])
 
-The duration parameter tells how long to execute the action in milliseconds e.g.launcher.up(2000) would move the turret up for 2 seconds
-If duration parameter is zero, one 'tick' of that action would be performed e.g. launcher.up(0) would move the turret up one 'tick'
-If duration parameter is missing, the action would be executed infinitely e.g. launcher.up() would move the turret up continuously
+The duration parameter tells how long to execute the action in milliseconds e.g.launcher.up(2000) would move the turret up for 2 seconds   
+If duration parameter is zero, one 'tick' of that action would be performed e.g. launcher.up(0) would move the turret up one 'tick'  
+If duration parameter is missing, the action would be executed infinitely e.g. launcher.up() would move the turret up continuously  
 
 Complex sequence of actions can be "programmable" e.g.
 
@@ -42,11 +46,5 @@ can be simply written as:
 
 A helper method reset() is provided which moves the turret to a parked/zero position.
 
-See an [example usage][5]
-
-  [1]: http://www.dreamcheeky.com/thunder-missile-launcher
-  [2]: http://stackoverflow.com/questions/10480654/std-gnu0xoption-for-macos
-  [3]: http://manpages.ubuntu.com/manpages/hardy/man1/pkg-config.1.html
-  [4]: http://ubuntuforums.org/showthread.php?t=1537201
-  [5]: http://github.com/pathikrit/node-thunder-webui
+See an [example usage](http://github.com/pathikrit/node-thunder-webui)
 
