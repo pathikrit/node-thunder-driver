@@ -21,32 +21,30 @@ if (!launcher) {
 
 function execute(cmd, duration, callback) {
   if (launcher) {
-    launcher.controlTransfer(0x21, 0x09, 0x0, 0x0, new Buffer([0x02, cmd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
-      function (data) {
-        if (_.isNumber(duration)) {
-          if (!_.isFunction(callback) && cmd != 0x20) {
-            callback = controller.stop;
+    launcher.controlTransfer(0x21, 0x09, 0x0, 0x0,
+        new Buffer([0x02, cmd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
+        function (data) {
+          if (_.isNumber(duration)) {
+            if (!_.isFunction(callback)) {
+              callback = cmd == 0x20 ? function () {
+              } : controller.stop;
+            }
+            setTimeout(callback, duration);
           }
-          setTimeout(callback, duration);
+          console.log("Executed " + cmd + ' for ' + duration);
         }
-        console.log("Executed " + cmd + ' for ' + duration);
-      }
     );
   }
-}
-
-function call(callback) {
-  (_.isFunction(callback) ? callback : controller.stop).call(this);
 }
 
 var controller = {};
 
 controller.u = controller.up = function (duration, callback) {
-  execute(0x01, duration, callback);
+  execute(0x02, duration, callback);
 };
 
 controller.d = controller.down = function (duration, callback) {
-  execute(0x02, duration, callback);
+  execute(0x01, duration, callback);
 };
 
 controller.l = controller.left = function (duration, callback) {
@@ -58,13 +56,13 @@ controller.r = controller.right = function (duration, callback) {
 };
 
 controller.s = controller.stop = function (callback) {
-  execute(0x20, callback);
+  execute(0x20, 0, callback);
 };
 
 controller.f = controller.fire = function (number, callback) {
   number = _.isNumber(number) && number >= 0 && number <= 4 ? number : 1;
   if (number == 0) {
-    call(callback);
+    controller.stop(callback);
   } else {
     execute(0x10, 4500, function () {
       controller.fire(number - 1, callback);
@@ -76,7 +74,7 @@ controller.execute = function (commands, callback) {
   if (_.isString(commands)) {
     controller.execute(commands.split(','), callback);
   } else if (commands.length == 0) {
-    call(callback);
+    controller.stop(callback);
   } else {
     var command = commands.shift();
     var number = command.length > 1 ? parseInt(command.substring(1)) : null;
