@@ -6,7 +6,7 @@ Prerequisites:
 
 Quick Start:
 
-    var launcher = require('node-thunder-drive');
+    var launcher = require('node-thunder-driver');
 
     // control methods
     launcher.up([duration, callback])
