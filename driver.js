@@ -2,9 +2,10 @@
   'use strict';
 
   var DEVICE = {
-    VENDOR_ID: 0x2123,
-
-    PRODUCT_ID: 0x1010,
+    ID: {
+      VENDOR : 0x2123,
+      PRODUCT: 0x1010
+    },
 
     CMD: {
       UP   : 0x02,
@@ -15,14 +16,15 @@
       STOP : 0x20
     },
 
-    MAX_MISSILES: 4,
-
-    MISSILE_RELOAD_DELAY: 4500
+    MISSILES: {
+      NUMBER         : 4,
+      RELOAD_DELAY_MS: 4500
+    }
   };
 
   var _ = require('underscore'), usb = require('node-usb/usb.js');
 
-  var launcher = usb.find_by_vid_and_pid(DEVICE.VENDOR_ID, DEVICE.PRODUCT_ID)[0];
+  var launcher = usb.find_by_vid_and_pid(DEVICE.ID.VENDOR, DEVICE.ID.PRODUCT)[0];
 
   if (!launcher) {
     throw 'Launcher not found - make sure your Thunder Missile Launcher is plugged in to a USB port';
@@ -74,11 +76,11 @@
   };
 
   controller.f = controller.fire = function (number, callback) {
-    number = _.isNumber(number) && number >= 0 && number <= DEVICE.MAX_MISSILES ? number : 1;
+    number = _.isNumber(number) && number >= 0 && number <= DEVICE.MISSILES.NUMBER ? number : 1;
     if (number === 0) {
       controller.stop(callback);
     } else {
-      execute(DEVICE.CMD.FIRE, DEVICE.MISSILE_RELOAD_DELAY, function () {
+      execute(DEVICE.CMD.FIRE, DEVICE.MISSILES.RELOAD_DELAY_MS, function () {
         controller.fire(number - 1, callback);
       });
     }
