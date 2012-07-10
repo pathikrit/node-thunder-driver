@@ -13,7 +13,8 @@
       LEFT : 0x04,
       RIGHT: 0x08,
       FIRE : 0x10,
-      STOP : 0x20
+      STOP : 0x20,
+      RESET: 'd2000,l8000'
     },
 
     MISSILES: {
@@ -47,10 +48,16 @@
           callback = controller.stop;
         }
         if (_.isFunction(callback)) {
-          setTimeout(callback, duration);
+          _.delay(callback, duration);
         }
       }
     );
+  }
+
+  function trigger(callback, p1, p2) {
+    return function () {
+      callback.call(this, p1, p2);
+    };
   }
 
   var controller = {};
@@ -80,13 +87,11 @@
     if (number === 0) {
       controller.stop(callback);
     } else {
-      execute(DEVICE.CMD.FIRE, DEVICE.MISSILES.RELOAD_DELAY_MS, function () {
-        controller.fire(number - 1, callback);
-      });
+      execute(DEVICE.CMD.FIRE, DEVICE.MISSILES.RELOAD_DELAY_MS, trigger(controller.fire, number - 1, callback));
     }
   };
 
-  controller.execute = function (commands, callback) {
+  controller.e = controller.execute = function (commands, callback) {
     if (_.isString(commands)) {
       controller.execute(commands.split(','), callback);
     } else if (commands.length === 0) {
@@ -94,14 +99,13 @@
     } else {
       var command = commands.shift();
       var number = command.length > 1 ? parseInt(command.substring(1), 10) : null;
-      controller[command[0]].call(this, number, function () {
-        controller.execute(commands, callback);
-      });
+      // todo - handle z and s
+      controller[command[0]].call(this, number, trigger(controller.execute, commands, callback));
     }
   };
 
-  controller.reset = function (callback) {
-    controller.execute('d2000,l8000', callback);
+  controller.z = controller.reset = function (callback) {
+    controller.execute(DEVICE.CMD.RESET, callback);
   };
 
   module.exports = controller;
