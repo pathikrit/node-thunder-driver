@@ -38,7 +38,7 @@
   launcherInterface.claim();
   process.on('exit', launcherInterface.release);
 
-  function execute(cmd, duration, callback) {
+  function signal(cmd, duration, callback) {
     launcher.controlTransfer(0x21, 0x09, 0x0, 0x0, new Buffer([0x02, cmd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
       function (data) {
         if (!_.isNumber(duration)) {
@@ -62,50 +62,64 @@
 
   var controller = {};
 
-  controller.u = controller.up = function (duration, callback) {
-    execute(DEVICE.CMD.UP, duration, callback);
+  controller.up = controller.u = function (duration, callback) {
+    signal(DEVICE.CMD.UP, duration, callback);
   };
 
-  controller.d = controller.down = function (duration, callback) {
-    execute(DEVICE.CMD.DOWN, duration, callback);
+  controller.down = controller.d = function (duration, callback) {
+    signal(DEVICE.CMD.DOWN, duration, callback);
   };
 
-  controller.l = controller.left = function (duration, callback) {
-    execute(DEVICE.CMD.LEFT, duration, callback);
+  controller.left = controller.l = function (duration, callback) {
+    signal(DEVICE.CMD.LEFT, duration, callback);
   };
 
-  controller.r = controller.right = function (duration, callback) {
-    execute(DEVICE.CMD.RIGHT, duration, callback);
+  controller.right = controller.r = function (duration, callback) {
+    signal(DEVICE.CMD.RIGHT, duration, callback);
   };
 
-  controller.s = controller.stop = function (callback) {
-    execute(DEVICE.CMD.STOP, 0, callback);
+  controller.stop = controller.s = function (callback) {
+    signal(DEVICE.CMD.STOP, 0, callback);
   };
 
-  controller.f = controller.fire = function (number, callback) {
+  controller.fire = controller.f = function (number, callback) {
     number = _.isNumber(number) && number >= 0 && number <= DEVICE.MISSILES.NUMBER ? number : 1;
     if (number === 0) {
       controller.stop(callback);
     } else {
-      execute(DEVICE.CMD.FIRE, DEVICE.MISSILES.RELOAD_DELAY_MS, trigger(controller.fire, number - 1, callback));
+      signal(DEVICE.CMD.FIRE, DEVICE.MISSILES.RELOAD_DELAY_MS, trigger(controller.fire, number - 1, callback));
     }
   };
 
-  controller.e = controller.execute = function (commands, callback) {
+  controller.park = controller.p = function (callback) {
+    controller.execute(DEVICE.CMD.RESET, callback);
+  };
+
+  controller.execute = function (commands, callback) {
     if (_.isString(commands)) {
       controller.execute(commands.split(','), callback);
     } else if (commands.length === 0) {
       controller.stop(callback);
     } else {
-      var command = commands.shift();
-      var number = command.length > 1 ? parseInt(command.substring(1), 10) : null;
-      // todo - handle z and s
-      controller[command[0]].call(this, number, trigger(controller.execute, commands, callback));
+      var command = commands.shift(), func = command.length > 0 ? controller[command[0]] : null;
+      if (_.isFunction(func)) {
+        var next = trigger(controller.execute, commands, callback);
+        if (func === controller.park || func === controller.stop) {
+          func.call(this, next);
+        } else {
+          var number;
+          try {
+            number = parseInt(command.substring(1), 10);
+          } catch (ignore) {
+            number = null;
+          }
+          func.call(this, number, next);
+        }
+      } else {
+        console.warn('Ignoring bad command: ' + command);
+        controller.execute(commands, callback);
+      }
     }
-  };
-
-  controller.z = controller.reset = function (callback) {
-    controller.execute(DEVICE.CMD.RESET, callback);
   };
 
   module.exports = controller;

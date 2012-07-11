@@ -18,7 +18,7 @@ Quick Start:
 
     // helper methods
     launcher.execute(command, [callback])
-    launcher.reset([callback])
+    launcher.park([callback])
 
 The duration parameter tells how long to execute the action in milliseconds e.g.launcher.up(2000) would move the turret up for 2 seconds   
 If duration parameter is zero, one 'tick' of that action would be performed e.g. launcher.up(0) would move the turret up one 'tick'  
@@ -44,7 +44,8 @@ can be simply written as:
       console.log('Finished executing up for 1s, down for 0.2s, left for 5s and then fired 2 missiles');
     });
 
-A helper method reset() is provided which moves the turret to a parked/zero position.
+A helper method park() is provided which moves the turret to a parked/zero position.
+The shortcut for park is 'p' e.g. this is a valid launch sequence - 'p,l1000,f'
 
-See an [example usage](http://github.com/pathikrit/node-thunder-webui)
+See a [sample project](http://github.com/pathikrit/node-thunder-webui) that uses this library
 
