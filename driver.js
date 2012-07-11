@@ -41,14 +41,8 @@
   function signal(cmd, duration, callback) {
     launcher.controlTransfer(0x21, 0x09, 0x0, 0x0, new Buffer([0x02, cmd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
       function (data) {
-        if (!_.isNumber(duration)) {
-          return;
-        }
-        if (!_.isFunction(callback) && cmd !== DEVICE.CMD.STOP) {
-          callback = controller.stop;
-        }
-        if (_.isFunction(callback)) {
-          _.delay(callback, duration);
+        if (_.isNumber(duration)) {
+          _.delay(_.isFunction(callback) ? callback : controller.stop, duration);
         }
       }
     );
@@ -79,7 +73,11 @@
   };
 
   controller.stop = controller.s = function (callback) {
-    signal(DEVICE.CMD.STOP, 0, callback);
+    if (_.isFunction(callback) && callback !== controller.stop) {
+      signal(DEVICE.CMD.STOP, 0, callback);
+    } else {
+      signal(DEVICE.CMD.STOP);
+    }
   };
 
   controller.fire = controller.f = function (number, callback) {
