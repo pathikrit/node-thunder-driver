@@ -14,7 +14,7 @@
       RIGHT: 0x08,
       FIRE : 0x10,
       STOP : 0x20,
-      RESET: 'd2000,l8000'
+      RESET: 'l8000,d2000'
     },
 
     MISSILES: {
