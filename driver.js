@@ -40,17 +40,17 @@
 
   function signal(cmd, duration, callback) {
     launcher.controlTransfer(0x21, 0x09, 0x0, 0x0, new Buffer([0x02, cmd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
-      function (data) {
-        if (_.isNumber(duration)) {
-          _.delay(_.isFunction(callback) ? callback : controller.stop, duration);
+        function (data) {
+          if (_.isNumber(duration)) {
+            _.delay(_.isFunction(callback) ? callback : controller.stop, duration);
+          }
         }
-      }
     );
   }
 
   function trigger(callback, p1, p2) {
     return function () {
-      callback.call(this, p1, p2);
+      callback(p1, p2);
     };
   }
 
@@ -103,7 +103,7 @@
       if (_.isFunction(func)) {
         var next = trigger(controller.execute, commands, callback);
         if (func === controller.park || func === controller.stop) {
-          func.call(this, next);
+          func(next);
         } else {
           var number;
           try {
@@ -111,7 +111,7 @@
           } catch (ignore) {
             number = null;
           }
-          func.call(this, number, next);
+          func(number, next);
         }
       } else {
         console.warn('Ignoring bad command: ' + command);

@@ -2,12 +2,6 @@
   "name"        : "node-thunder-driver",
   "version"     : "0.0.5",
   "author"      : "Pathikrit Bhowmick <pathikritbhowmick@msn.com>",
-  "contributors": [
-    {
-      "name" : "Pathikrit Bhowmick",
-      "email": "pathikritbhowmick@msn.com"
-    }
-  ],
   "description" : "nodejs driver for dream cheeky usb thunder missile launcher",
   "repository"  : {
     "type": "git",

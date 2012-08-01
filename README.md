@@ -51,7 +51,9 @@ launcher.execute('u1000,d200,l5000,f2', function() {
 ```
 
 A helper method park() is provided which moves the turret to a parked/zero position.
-The shortcut for park is 'p' e.g. this is a valid launch sequence - 'p,l1000,f'
+The shortcut for park is 'p' e.g. this is a valid launch sequence: `p,l1000,f`
 
 See a [sample project](http://github.com/pathikrit/node-thunder-webui) that uses this library
+
+Future work - coming up with API `launcher.aim(x,y,z,numOfMisToFire-0)` with launcher at `0,0,0`
 
