@@ -57,3 +57,7 @@ See a [sample project](http://github.com/pathikrit/node-thunder-webui) that uses
 
 Future work - coming up with API `launcher.aim(x,y,z,numOfMisToFire-0)` with launcher at `0,0,0`
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/pathikrit/node-thunder-driver/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
